@@ -1,0 +1,72 @@
+%YAML 1.2
+---
+name: spark-streaming-app
+
+dataType: stream
+
+streamBatchSeconds: 20
+
+udaf:
+
+udf:
+
+inputs:
+  - items:
+      brokers: 10.239.50.120:9092
+      topic: message-bus
+      groupId: spark-job
+      autoCommit: true
+      commitOffset: true
+    type: kafka
+    clazz: com.zxin.spark.pipeline.stages.input.KafkaInputWorker
+    sourceTableName: kafka-source
+
+
+processes:
+  - step:
+      name: table1
+      sql: "select name, xx as udfed, gen, age, as dt from ${kafka-source}"
+      cache: true # 出发action操作，缓存执行SQL后的表
+      store: true # 是否保存到本地，debug用，保存目录 $baseDir/{{EVENT_DATE}}/table
+      show: 20 # 在控制台打印表中数据，不打印则删除该节点，df.show(20)
+      partations: 3 # reparation 个数，不reparation则删除节点
+  - step:
+      name: table2
+      sql: "select name, count(1) as count from ${table1} group by name"
+      cache: true
+      store: true
+      show: 20
+      partations: 3
+  - step:
+      name: table3
+      sql: "select name, count(1) as count from ${table4} union all ${table2}"
+      cache: true
+      store: true
+      show: 20
+      partations: 3
+  - step:
+      name: table4
+      sql: "select name, count(1) as count from ${table1} union all ${table2}"
+      cache: true
+      store: true
+      show: 20
+      partations: 3
+
+outputs:
+  - name: out1
+    type: hdfsfile
+    srcName: dm_road_trackset_di
+    format: csv # 保存为 csvexample-kafka.yamlexample-kafka.yaml
+    path: /user/osp/data/csv/${EVENT_DATE}
+
+envs:
+  spark:
+    # spark参数
+    - spark.driver.memory=1g
+    - spark.driver.cores=1
+    - spark.executor.cores=1
+    - spark.executor.instances=1
+    - spark.executor.memory=1g
+    - spark.executor.memoryOverhead=1024
+    - spark.test.param=true
+    - spark.serializer=org.apache.spark.serializer.KryoSerializer

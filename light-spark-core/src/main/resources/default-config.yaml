@@ -1,0 +1,8 @@
+%YAML 1.2
+---
+envs:
+  spark:
+    # spark参数
+    - spark.driver.memory=512M
+    - spark.driver.cores=10
+    - spark.driver.default=10

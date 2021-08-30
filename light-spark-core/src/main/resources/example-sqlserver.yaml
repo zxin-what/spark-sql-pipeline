@@ -1,0 +1,56 @@
+%YAML 1.2
+---
+name: spark-sqlserver-app
+
+udaf:
+
+udf:
+
+inputs:
+  - type: jdbc
+    driver: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://10.239.50.159:1433;databaseName=StackOverflow;
+    user: sa
+    password: "!@12qwaszx"
+    clazz: com.zxin.spark.pipeline.stages.input.JdbcInputWorker
+    name: Posts
+#    query: "select TOP 100 * from Posts"
+    dbtable:
+      Posts: Posts
+
+
+processes:
+  - step:
+      name: table1
+      sql: "select Id,Body,CommentCount  from ${Posts}"
+      cache: false # 出发action操作，缓存执行SQL后的表
+      store: false # 是否保存到本地，debug用，保存目录 $baseDir/{{EVENT_DATE}}/table
+      partations: 3 # reparation 个数，不reparation则删除节点
+  - step:
+      name: table2
+      sql: "select Id,Body,CommentCount from ${table1} order by CommentCount desc limit 100000"
+      cache: false
+      store: false
+      partations: 3
+
+outputs:
+  - type: jdbc
+    driver: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://10.239.50.159:1433;databaseName=StackOverflow;
+    user: sa
+    password: "!@12qwaszx"
+    name: Out
+    tables:
+      table2: Out
+
+envs:
+  spark:
+    # spark参数
+    - spark.driver.memory=1g
+    - spark.driver.cores=1
+    - spark.executor.cores=8
+    - spark.executor.instances=2
+    - spark.executor.memory=4g
+    - spark.executor.memoryOverhead=4096
+    - spark.test.param=true
+    - spark.serializer=org.apache.spark.serializer.KryoSerializer

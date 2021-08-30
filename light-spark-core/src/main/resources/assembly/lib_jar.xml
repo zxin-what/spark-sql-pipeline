@@ -1,0 +1,39 @@
+<assembly>
+    <id>with-jar</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+
+    <dependencySets>
+        <!--把依赖都打包进libs文件夹-->
+        <dependencySet>
+            <useProjectArtifact>true</useProjectArtifact>
+            <outputDirectory>libs</outputDirectory>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+
+    <files>
+        <!--把pom.xml打包进source文件夹-->
+        <file>
+            <source>${project.basedir}/pom.xml</source>
+            <outputDirectory>sources</outputDirectory>
+        </file>
+        <!--把assembly.xml打包放到source文件夹-->
+    </files>
+
+    <!--用于指定文件目录-->
+    <fileSets>
+        <!--配置source中的.xml和.properties文件输出到conf文件中-->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+                <include>*.xml</include>
+                <include>*.properties</include>
+                <include>*.yaml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+</assembly>
