@@ -1,4 +1,4 @@
-package com.zxin.spark.pipeline.stages.Transform
+package com.zxin.spark.pipeline.stages.transform
 
 import com.zxin.spark.pipeline.beans.BaseConfig
 import com.zxin.spark.pipeline.beans.transform.CustomTransformConfig

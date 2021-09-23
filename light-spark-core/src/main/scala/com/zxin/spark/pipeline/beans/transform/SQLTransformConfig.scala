@@ -1,6 +1,6 @@
 package com.zxin.spark.pipeline.beans.transform
 
-import com.zxin.spark.pipeline.stages.Transform.SQLTransformWorker
+import com.zxin.spark.pipeline.stages.transform.SQLTransformWorker
 
 import scala.beans.BeanProperty
 

@@ -1,6 +1,6 @@
 package com.zxin.spark.pipeline.beans.transform
 
-import com.zxin.spark.pipeline.stages.Transform.CustomTransformWorker
+import com.zxin.spark.pipeline.stages.transform.CustomTransformWorker
 
 class CustomTransformConfig extends BaseTransformConfig {
 

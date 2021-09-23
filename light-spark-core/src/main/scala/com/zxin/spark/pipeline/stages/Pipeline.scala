@@ -7,7 +7,7 @@ import com.zxin.spark.pipeline.beans.{BaseConfig, BusinessConfig}
 import com.zxin.spark.pipeline.beans.transform.BaseTransformConfig
 import com.zxin.spark.pipeline.constants.SysConstants
 import com.zxin.spark.pipeline.function.BaseUDF
-import com.zxin.spark.pipeline.stages.Transform.SQLTransformWorker
+import com.zxin.spark.pipeline.stages.transform.SQLTransformWorker
 import com.zxin.spark.pipeline.stages.output.OutputStrategies
 import com.zxin.spark.pipeline.uitils.{AppUtil, ReflectUtils, SparkUtil}
 import org.apache.spark.sql.SparkSession
