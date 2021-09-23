@@ -24,29 +24,20 @@ class KafkaInputWorker extends StreamBaseInputWorker with CustomBaseInput{
    * @param bean BaseInputConfig
    * @param ss   SparkSession
    */
-  override def initDS(bean: BaseConfig)(implicit ss: SparkSession, ssc: StreamingContext): DStream[ConsumerRecord[String, String]] = {
+  override def initDf(bean: BaseConfig)(implicit ss: SparkSession): Unit = {
     val kafkaInput = bean.asInstanceOf[KafkaInputConfig]
-    kafkaInput.items.asScala.map(kafkaInputItem => {
-      val kafkaParams: Map[String, Object] = getKafkaParam(kafkaInputItem)
-      KafkaUtils.createDirectStream[String, String](
-        ssc,
-        LocationStrategies.PreferConsistent,
-        ConsumerStrategies.Subscribe[String, String](Seq(kafkaInputItem.topic), kafkaParams)
-      )
-    }).reduce(reduceDstream)
-  }
-
-  def reduceDstream(x: DStream[ConsumerRecord[String, String]], y: DStream[ConsumerRecord[String, String]]): DStream[ConsumerRecord[String, String]] = {
-    x.union(y)
+    kafkaInput.items.asScala.foreach(kafkaInputItem => {
+      ss.read.format("kafka").options(getKafkaParam(kafkaInputItem).asJava).load().createOrReplaceTempView(kafkaInput.getSourceTableName)
+    })
   }
 
   /**
    * 合并 kafka参数
    */
-  private def getKafkaParam(item: KafkaInputItem): Map[String, Object] = {
+  private def getKafkaParam(item: KafkaInputItem): Map[String, String] = {
     val defaultKafkaParams = getDefaultParam
     Option(item.brokers).foreach(v => defaultKafkaParams += ("bootstrap.servers" -> v))
-    Option(item.autoCommit).filter(_ != null).foreach(v => defaultKafkaParams += ("enable.auto.commit" -> v))
+    Option(item.autoCommit).filter(_ != null).foreach(v => defaultKafkaParams += ("enable.auto.commit" -> v.toString))
     Option(item.offersetReset).filter(v => StringUtils.isNotBlank(v)).foreach(v => defaultKafkaParams += ("auto.offset.reset" -> v))
     Option(item.groupId).foreach(v => defaultKafkaParams += ("group.id" -> v))
     Option(item.params).filter(params => CollectionUtils.isNotEmpty(params)).foreach(kvs => {
@@ -63,14 +54,14 @@ class KafkaInputWorker extends StreamBaseInputWorker with CustomBaseInput{
   /**
    * kafka 默认参数
    */
-  private def getDefaultParam: mutable.Map[String, Object] = {
-    scala.collection.mutable.Map[String, Object](
+  private def getDefaultParam: mutable.Map[String, String] = {
+    scala.collection.mutable.Map[String, String](
       "bootstrap.servers" -> "localhost:9092,anotherhost:9092",
-      "key.deserializer" -> classOf[StringDeserializer],
-      "value.deserializer" -> classOf[StringDeserializer],
+      "key.deserializer" -> classOf[StringDeserializer].toString,
+      "value.deserializer" -> classOf[StringDeserializer].toString,
       "group.id" -> "use_a_separate_group_id_for_each_stream",
       "auto.offset.reset" -> "latest",
-      "enable.auto.commit" -> (false: java.lang.Boolean)
+      "enable.auto.commit" -> ("false")
     )
   }
 

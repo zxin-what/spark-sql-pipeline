@@ -5,7 +5,7 @@ import com.alibaba.fastjson.serializer.SerializeFilter
 import com.zxin.spark.pipeline.beans.BusinessConfig
 import com.zxin.spark.pipeline.config.{BusConfig, CacheConstants}
 import com.zxin.spark.pipeline.constants.{AppConstants, SysConstants}
-import com.zxin.spark.pipeline.stages.{BatchPip, StreamPip}
+import com.zxin.spark.pipeline.stages.Pipeline
 import com.zxin.spark.pipeline.uitils.{Logging, SparkUtil}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -26,29 +26,10 @@ object App extends Logging {
     val strConf = JSON.toJSONString(confMap, new Array[SerializeFilter](0))
 
     val sparkConf = SparkUtil.getSparkConf(appConfig, strConf)
-    if (appConfig.isStreaming) {
-      stream(appConfig, sparkConf)
-    } else {
-      batch(appConfig, sparkConf)
-    }
+    implicit val sparkSession: SparkSession = SparkUtil.initSparkSession(sparkConf, hiveEnabled = false)
+    Pipeline.runTask(appConfig)
     cleanUp()
     logger.info(s"context exit success.")
-  }
-
-  private def batch(appConfig: BusinessConfig, sparkConf: SparkConf): Unit = {
-    logger.info("start batch process.")
-    implicit val sparkSession: SparkSession = SparkUtil.initSparkSession(sparkConf, hiveEnabled = false)
-    BatchPip.startPip(appConfig)
-    sparkSession.stop()
-  }
-
-  private def stream(appConfig: BusinessConfig, sparkConf: SparkConf): Unit = {
-    logger.info("start stream process.")
-    implicit val sparkSession: SparkSession = SparkUtil.initSparkSession(sparkConf, hiveEnabled = false)
-    implicit val ssc: StreamingContext = new StreamingContext(sparkSession.sparkContext, Seconds(appConfig.streamBatchSeconds))
-    StreamPip.startPip(appConfig)
-    ssc.stop()
-    sparkSession.stop()
   }
 
   private def cleanUp(): Unit = {

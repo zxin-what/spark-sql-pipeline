@@ -9,5 +9,5 @@ import org.apache.spark.streaming.dstream.DStream
 trait StreamBaseInputWorker extends BaseWorker {
   def process(bean: BaseConfig)(implicit ss: SparkSession): Unit = {}
 
-  def initDS(bean: BaseConfig)(implicit ss: SparkSession, ssc: StreamingContext): DStream[ConsumerRecord[String, String]]
+  def initDf(bean: BaseConfig)(implicit ss: SparkSession): Unit
 }

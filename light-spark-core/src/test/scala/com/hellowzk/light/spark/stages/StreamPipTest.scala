@@ -1,6 +1,4 @@
 package com.zxin.spark.pipeline.stages
-import java.util
-
 import com.zxin.spark.pipeline.beans.transform.BaseTransformConfig
 import org.junit.Test
 
@@ -21,7 +19,7 @@ class StreamPipTest {
     lineage.append((s"e", "final", new BaseTransformConfig))
     lineage.append((s"d", "final", new BaseTransformConfig))
 
-    val lineageRelations = PipelineTask.bfs(lineage.toList, "sourceTable")
+    val lineageRelations = Pipeline.bfs(lineage.toList, "sourceTable")
     println(lineageRelations)
   }
 }
