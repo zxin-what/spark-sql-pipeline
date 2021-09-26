@@ -8,9 +8,6 @@ class KafkaInputConfig extends StreamInputConfig {
   @BeanProperty
   var items: java.util.List[KafkaInputItem] = _
 
-  @BeanProperty
-  var sourceTableName: String = _
-
   override def checkNoneIsBlank(): Unit = {
     validateNoneIsBlank("items")
   }

@@ -10,4 +10,9 @@ class BaseTransformConfig extends BaseConfig {
   var step: BaseConfig = _
   @BeanProperty
   var clazz: String = _
+
+  def this(sql: String) {
+    this
+    this.sql = sql
+  }
 }

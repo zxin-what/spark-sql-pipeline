@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession
 object OutputStrategies {
 
   val outputWorkers: Map[String, BaseWorker] = Map(
-    "hdfs" -> new HdfsOutputWorker,
+    "hdfsfile" -> new HdfsOutputWorker,
     "hive" -> new HiveOutputWorker,
     "jdbc" -> new JdbcOutputWorker)
 

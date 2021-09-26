@@ -14,7 +14,7 @@ inputs:
     password: "!@12qwaszx"
     clazz: com.zxin.spark.pipeline.stages.input.JdbcInputWorker
     name: Posts
-#    query: "select TOP 100 * from Posts"
+    query: "select TOP 100 * from Posts"
     dbtable:
       Posts: Posts
 

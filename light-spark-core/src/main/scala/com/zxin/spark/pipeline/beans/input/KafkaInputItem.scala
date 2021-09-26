@@ -6,7 +6,7 @@ class KafkaInputItem extends Serializable {
   @BeanProperty
   var brokers: String = _
   @BeanProperty
-  var topic: String = _
+  var subscribe: String = _
   @BeanProperty
   var groupId: String = _
   @BeanProperty
